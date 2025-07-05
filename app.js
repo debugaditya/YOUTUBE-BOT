@@ -12,6 +12,17 @@ const { client_secret, client_id, redirect_uris } = credentials.web;
 const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 console.log("✅ OAuth2 client initialized.");
 oAuth2Client.setCredentials(token);
+oAuth2Client.on('tokens', (tokens) => {
+  if (tokens.refresh_token) {
+    token.refresh_token = tokens.refresh_token;
+  }
+  if (tokens.access_token) {
+    token.access_token = tokens.access_token;
+  }
+  const fs = require('fs');
+  fs.writeFileSync('token.json', JSON.stringify(token, null, 2));
+  console.log("🔄 Token refreshed and saved.");
+});
 console.log("🔑 Token set. Authorization complete.");
 console.log("📡 Initializing YouTube client...");
 const youtube = google.youtube({ version: 'v3', auth: oAuth2Client });
